@@ -5,13 +5,13 @@ This module enable possibility to disable Add to cart button from product and ca
 It can be useful for B2B customers, if we don't want to allow guest to add product to cart.
 
 ## Compatibility
-- Magento 2.1.x - 2.2.x
+- Magento 2.1, 2.2, 2.3
 
 ## Installation details
 1. Run `composer require sbodak/magento2-b2b-disable-add-to-cart-button-for-guest`
 2. Run `php bin/magento module:enable Bodak_DisableAddToCart`
-3. Run `bin/magento setup:upgrade`
-4. Run `bin/magento cache:clean`
+3. Run `php bin/magento setup:upgrade`
+4. Run `php bin/magento cache:clean`
 
 ## Configuration details
 1. Go to Magento admin interface 

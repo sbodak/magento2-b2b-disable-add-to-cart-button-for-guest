@@ -16,6 +16,8 @@ use Magento\Framework\App\Http\Context;
 use Magento\Customer\Model\Context as CustomerContext;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\App\State;
+use Magento\Framework\App\Area;
 
 /**
  * Class IsSalablePlugin
@@ -40,6 +42,12 @@ class IsSalablePlugin
      */
     protected $context;
 
+    /**
+     * @var State
+     */
+    private $state;
+
+
     const DISABLE_ADD_TO_CART = 'catalog/frontend/catalog_frontend_disable_add_to_cart_for_guest';
 
     /**
@@ -47,13 +55,16 @@ class IsSalablePlugin
      *
      * @param ScopeConfigInterface $scopeConfig ScopeConfigInterface
      * @param Context              $context     Context
+     * @param State                $state       State
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
-        Context $context
+        Context $context,
+        State $state
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->context = $context;
+        $this->state = $state;
     }
 
     /**
@@ -63,6 +74,10 @@ class IsSalablePlugin
      */
     public function afterIsSalable(): bool
     {
+        if($this->state->getAreaCode() == Area::AREA_ADMINHTML) {
+            return true;
+        }
+
         $scope = ScopeInterface::SCOPE_STORE;
 
         if ($this->scopeConfig->getValue(self::DISABLE_ADD_TO_CART, $scope)) {

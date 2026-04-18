@@ -12,9 +12,10 @@ declare(strict_types=1);
 
 namespace Bodak\DisableAddToCart\Plugin;
 
-use Magento\Framework\App\Http\Context;
+use Magento\Catalog\Model\Product;
 use Magento\Customer\Model\Context as CustomerContext;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Http\Context;
 use Magento\Store\Model\ScopeInterface;
 
 /**
@@ -25,28 +26,23 @@ use Magento\Store\Model\ScopeInterface;
  */
 class IsSalablePlugin
 {
+    const DISABLE_ADD_TO_CART = 'catalog/frontend/catalog_frontend_disable_add_to_cart_for_guest';
+
     /**
-     * Scope config
-     *
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
 
     /**
-     * HTTP Context
-     * Customer session is not initialized yet
-     *
      * @var Context
      */
     protected $context;
 
-    const DISABLE_ADD_TO_CART = 'catalog/frontend/catalog_frontend_disable_add_to_cart_for_guest';
-
     /**
-     * SalablePlugin constructor.
+     * IsSalablePlugin constructor.
      *
-     * @param ScopeConfigInterface $scopeConfig ScopeConfigInterface
-     * @param Context              $context     Context
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Context              $context
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -57,20 +53,20 @@ class IsSalablePlugin
     }
 
     /**
-     * Check if is disable add to cart and if customer is logged in
+     * Restrict salability for guest users when the feature is enabled.
      *
+     * @param Product $subject
+     * @param bool    $result
      * @return bool
      */
-    public function afterIsSalable(): bool
+    public function afterIsSalable(Product $subject, bool $result): bool
     {
-        $scope = ScopeInterface::SCOPE_STORE;
-
-        if ($this->scopeConfig->getValue(self::DISABLE_ADD_TO_CART, $scope)) {
+        if ($this->scopeConfig->getValue(self::DISABLE_ADD_TO_CART, ScopeInterface::SCOPE_STORE)) {
             if ($this->context->getValue(CustomerContext::CONTEXT_AUTH)) {
-                return true;
+                return $result;
             }
             return false;
         }
-        return true;
+        return $result;
     }
 }
